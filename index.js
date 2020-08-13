@@ -14,11 +14,7 @@ const user = "maxime";
 const password = "MIALy4PiTZpvMa1I";
 const url = `mongodb+srv://${user}:${password}@ce-news.knrp2.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html");
-  res.end('<a href="https://backend-ce-news.herokuapp.com/data">see data</a>');
-});
+const server = http.createServer(app);
 
 mongo.connect(
   url,
