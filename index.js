@@ -8,6 +8,7 @@ const socketio = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
+const websocket = socketio(server);
 
 app.use(cors());
 app.use(bodyParser.json());
