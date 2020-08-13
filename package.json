@@ -7,6 +7,10 @@
     "start": "node index",
     "dev": "nodemon index"
   },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "author": "Maxime",
   "license": "ISC",
   "dependencies": {
