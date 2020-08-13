@@ -31,7 +31,7 @@ mongo.connect(
   }
 );
 
-app.get("/data", function (req, res, next) {
+app.get("/", function (req, res, next) {
   mongo.connect(url, function (err, database) {
     const db = database.db("myDatabase");
     const collection = db.collection("users");
