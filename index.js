@@ -1,24 +1,95 @@
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const socketio = require("socket.io");
 const bodyParser = require("body-parser");
-
-var mongojs = require("mongojs");
 const mongo = require("mongodb").MongoClient;
+const mongojs = require("mongojs");
+const socketio = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
 const websocket = socketio(server);
 
+app.use(cors());
+app.use(bodyParser.json());
+
+const port = process.env.PORT || 3000;
 const hostname = "backend-ce-news.herokuapp.com";
-const port = 3001;
 let dbName = "myDatabase";
 const user = "maxime";
 const password = "MIALy4PiTZpvMa1I";
 const url = `mongodb+srv://${user}:${password}@ce-news.knrp2.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-app.use(cors());
-app.use(bodyParser.json());
+
+mongo.connect(
+  url,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (err) => {
+    console.log(`Connecter à ${dbName}!`);
+  }
+);
+
+app.get("/", function (req, res, next) {
+  mongo.connect(url, function (err, database) {
+    const db = database.db("myDatabase");
+    const collection = db.collection("users");
+    collection.find({}).toArray((x, result) => {
+      res.send(result);
+    });
+  });
+});
+
+app.post("/", function (req, res, next) {
+  mongo.connect(url, function (err, database) {
+    const db = database.db("myDatabase");
+    const collection = db.collection("users");
+    let something = {
+      _id: req.body._id,
+      email: req.body.email,
+      password: req.body.password,
+    };
+    collection.insertOne(something, (x, result) => {
+      res.send(result);
+    });
+  });
+});
+
+app.delete("/", function (req, res, next) {
+  mongo.connect(url, function (err, database) {
+    const db = database.db("myDatabase");
+    const collection = db.collection("users");
+    let something = {
+      _id: req.body._id,
+    };
+    collection.deleteOne(something, (x, result) => {
+      res.send(result);
+    });
+  });
+});
+
+app.put("/", function (req, res, next) {
+  mongo.connect(url, function (err, database) {
+    const db = database.db("myDatabase");
+    const collection = db.collection("users");
+    let something = {
+      _id: req.body._id,
+    };
+    collection.findOneAndUpdate(
+      something,
+      {
+        $set: {
+          email: req.body.email,
+          password: req.body.password,
+        },
+      },
+      (x, result) => {
+        res.send(result);
+      }
+    );
+  });
+});
 
 /** DEBUT chat */
 
@@ -91,77 +162,6 @@ function _sendAndSaveMessage(message, socket, fromServer) {
 }
 /**FIN */
 
-mongo.connect(
-  url,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-  (err) => {
-    console.log("Connecter à myDatabase!");
-  }
-);
-
-app.get("/data", function (req, res, next) {
-  mongo.connect(url, function (err, database) {
-    const db = database.db("myDatabase");
-    const collection = db.collection("users");
-    collection.find({}).toArray((x, result) => {
-      res.send(result);
-    });
-  });
-});
-
-app.post("/data", function (req, res, next) {
-  mongo.connect(url, function (err, database) {
-    const db = database.db("myDatabase");
-    const collection = db.collection("users");
-    let something = {
-      _id: req.body._id,
-      email: req.body.email,
-      password: req.body.password,
-    };
-    collection.insertOne(something, (x, result) => {
-      res.send(result);
-    });
-  });
-});
-
-app.delete("/data", function (req, res, next) {
-  mongo.connect(url, function (err, database) {
-    const db = database.db("myDatabase");
-    const collection = db.collection("users");
-    let something = {
-      _id: req.body._id,
-    };
-    collection.deleteOne(something, (x, result) => {
-      res.send(result);
-    });
-  });
-});
-
-app.put("/data", function (req, res, next) {
-  mongo.connect(url, function (err, database) {
-    const db = database.db("myDatabase");
-    const collection = db.collection("users");
-    let something = {
-      _id: req.body._id,
-    };
-    collection.findOneAndUpdate(
-      something,
-      {
-        $set: {
-          email: req.body.email,
-          password: req.body.password,
-        },
-      },
-      (x, result) => {
-        res.send(result);
-      }
-    );
-  });
-});
-
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/data`);
+server.listen(port, () => {
+  console.log(`Server running at port ` + port);
 });
