@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const websocket = socketio(server);
 
-const hostname = "localhost";
+const hostname = "backend-ce-news.herokuapp.com";
 const port = 3001;
 let dbName = "myDatabase";
 const user = "maxime";
